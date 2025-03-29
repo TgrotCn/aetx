@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14) # for add_link_options and implicit target directories.
-project("yalm" C CXX CUDA)
+project("aetx" C CXX CUDA)
 include(CheckIncludeFileCXX)
 
 #set(CMAKE_WARN_DEPRECATED YES)
@@ -33,11 +33,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    set(YALM_STANDALONE ON)
+    set(AETX_STANDALONE ON)
     include(git-vars)
 
 else()
-    set(YALM_STANDALONE OFF)
+    set(AETX_STANDALONE OFF)
 endif()
 
 
@@ -46,24 +46,24 @@ set(BUILD_SHARED_LIBS_DEFAULT OFF)
 option(BUILD_SHARED_LIBS "build shared libraries" ${BUILD_SHARED_LIBS_DEFAULT})
 
 # debug
-option(YALM_ALL_WARNINGS           "yalm: enable all compiler warnings"                   ON)
-option(YALM_ALL_WARNINGS_3RD_PARTY "yalm: enable all compiler warnings in 3rd party libs" OFF)
+option(AETX_ALL_WARNINGS           "aetx: enable all compiler warnings"                   ON)
+option(AETX_ALL_WARNINGS_3RD_PARTY "aetx: enable all compiler warnings in 3rd party libs" OFF)
 
 # build
-option(YALM_FATAL_WARNINGS "yalm: enable -Werror flag" OFF)
+option(AETX_FATAL_WARNINGS "aetx: enable -Werror flag" OFF)
 
 # sanitizers  是一类用于检测程序中的潜在错误和不规范行为的工具，通常在开发和调试阶段使用。
-option(YALM_SANITIZE_THREAD    "yalm: enable thread sanitizer"    OFF)
-option(YALM_SANITIZE_ADDRESS   "yalm: enable address sanitizer"   OFF)
-option(YALM_SANITIZE_UNDEFINED "yalm: enable undefined sanitizer" OFF)
+option(AETX_SANITIZE_THREAD    "aetx: enable thread sanitizer"    OFF)
+option(AETX_SANITIZE_ADDRESS   "aetx: enable address sanitizer"   OFF)
+option(AETX_SANITIZE_UNDEFINED "aetx: enable undefined sanitizer" OFF)
 
 # utils
-option(YALM_BUILD_COMMON "yalm: build common utils library" ${YALM_STANDALONE})
+option(AETX_BUILD_COMMON "aetx: build common utils library" ${AETX_STANDALONE})
 
 # extra artifacts
-option(YALM_BUILD_TESTS    "yalm: build tests"          ${YALM_STANDALONE})
-option(YALM_BUILD_EXAMPLES "yalm: build examples"       ${YALM_STANDALONE})
-option(YALM_BUILD_SERVER   "yalm: build server example" OFF)
+option(AETX_BUILD_TESTS    "aetx: build tests"          ${AETX_STANDALONE})
+option(AETX_BUILD_EXAMPLES "aetx: build examples"       ${AETX_STANDALONE})
+option(AETX_BUILD_SERVER   "aetx: build server example" OFF)
 
 # 3rd party libs
 # option(LLAMA_CURL "llama: use libcurl to download model from an URL" OFF)
@@ -75,8 +75,8 @@ option(YALM_BUILD_SERVER   "yalm: build server example" OFF)
 
 # TO DO
 # override ggml options
-# set(GGML_ALL_WARNINGS   ${YALM_ALL_WARNINGS})
-# set(GGML_FATAL_WARNINGS ${YALM_FATAL_WARNINGS})
+# set(GGML_ALL_WARNINGS   ${AETX_ALL_WARNINGS})
+# set(GGML_FATAL_WARNINGS ${AETX_FATAL_WARNINGS})
 
 # change the default for these ggml options
 # if (NOT DEFINED GGML_LLAMAFILE)
@@ -88,7 +88,7 @@ option(YALM_BUILD_SERVER   "yalm: build server example" OFF)
 # endif()
 
 # transition helpers
-function (yalm_option_depr TYPE OLD NEW)
+function (aetx_option_depr TYPE OLD NEW)
     if (${OLD})
         message(${TYPE} "${OLD} is deprecated and will be removed in the future.\nUse ${NEW} instead\n")
         set(${NEW} ON PARENT_SCOPE)
@@ -100,7 +100,7 @@ add_subdirectory(src)
 # vendor
 add_subdirectory(vendor)
     # examples
-if (YALM_BUILD_EXAMPLES)
+if (AETX_BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
 
@@ -114,20 +114,20 @@ endif()
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(YALM_BUILD_NUMBER        ${BUILD_NUMBER})
-set(YALM_BUILD_COMMIT        ${BUILD_COMMIT})
-set(YALM_INSTALL_VERSION 0.0.${BUILD_NUMBER})
+set(AETX_BUILD_NUMBER        ${BUILD_NUMBER})
+set(AETX_BUILD_COMMIT        ${BUILD_COMMIT})
+set(AETX_INSTALL_VERSION 0.0.${BUILD_NUMBER})
 
-set(YALM_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Location of header  files")
-set(YALM_LIB_INSTALL_DIR     ${CMAKE_INSTALL_LIBDIR}     CACHE PATH "Location of library files")
-set(YALM_BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Location of binary  files")
+set(AETX_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Location of header  files")
+set(AETX_LIB_INSTALL_DIR     ${CMAKE_INSTALL_LIBDIR}     CACHE PATH "Location of library files")
+set(AETX_BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Location of binary  files")
 
 
 # TO DO
 # 公共头文件 被编译为共享库时可被外部使用
-# set_target_properties(yalm
+# set_target_properties(aetx
 #     PROPERTIES
 #         PUBLIC_HEADER "${LLAMA_PUBLIC_HEADERS}")
 
-# install(TARGETS yalm LIBRARY PUBLIC_HEADER)
+# install(TARGETS aetx LIBRARY PUBLIC_HEADER)
 

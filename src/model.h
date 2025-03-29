@@ -64,7 +64,7 @@ struct Config {
   DType weight_dtype;
 
   // If nonzero `context` is supplied, max sequence length is limited to `context`.
-  void from_yalm(YALMData& yalm, int context = 0);
+  void from_aetx(AETXData& aetx, int context = 0);
   size_t active_bytes(size_t pos) const;
 };
 
@@ -277,7 +277,7 @@ struct Model {
   // classifier weights for the logits, on the last layer
   void* wcls = nullptr; // (vocab_size, dim)
 
-  Model(YALMData& yalm, int context = 0);
+  Model(AETXData& aetx, int context = 0);
   
   void forward(InferenceState& s, int token, int pos, InferenceMode mode = InferenceMode::OUTPUT_LOGITS);
   void cuda();

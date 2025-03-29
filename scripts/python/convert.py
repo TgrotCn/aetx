@@ -1,4 +1,4 @@
-# Converts a model consisting of a huggingface config.json, tokenizer.json, and .safetensors weights into a .yalm file,
+# Converts a model consisting of a huggingface config.json, tokenizer.json, and .safetensors weights into a .aetx file,
 # which:
 # - Normalizes the config to a common format in the header
 # - Combines any safetensors shards

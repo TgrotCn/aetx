@@ -16,7 +16,7 @@
 
 void error_usage() {
   fprintf(stderr, "Usage:   main <checkpoint> [options]\n");
-  fprintf(stderr, "Example: main model.yalm -i \"Q: What is the meaning of life?\"\n");
+  fprintf(stderr, "Example: main model.aetx-cli -i \"Q: What is the meaning of life?\"\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -h Display this help message\n");
   fprintf(stderr, "  -d [cpu,cuda] which device to use (default - cuda)\n");
@@ -60,7 +60,7 @@ void run_completion(
   float temperature
 ) {
   // printf("temp:%f\n", temperature);
-  YALMData model_data;
+  AETXData model_data;
   model_data.from_file(checkpoint_path);
   Model model(model_data, context);
   InferenceState state(model.config);
@@ -155,7 +155,7 @@ void run_perplexity(
   const std::string& prompt,
   const int context
 ) {
-  YALMData model_data;
+  AETXData model_data;
   model_data.from_file(checkpoint_path);
   Model model(model_data, context);
   InferenceState state(model.config);
@@ -243,7 +243,7 @@ void run_passkey(
   const int n_junk,
   const int passkey_pos
 ) {
-  YALMData model_data;
+  AETXData model_data;
   model_data.from_file(checkpoint_path);
   Model model(model_data, context);
   InferenceState state(model.config);

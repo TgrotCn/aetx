@@ -13,32 +13,32 @@
 
 using json = nlohmann::json;
 
-void Config::from_yalm(YALMData& yalm, int context) {
-  arch = yalm.metadata.at("arch").get<std::string>();
+void Config::from_aetx(AETXData& aetx, int context) {
+  arch = aetx.metadata.at("arch").get<std::string>();
   printf("arch: %s\n", arch.c_str());
-  dim = std::stoi(yalm.metadata.at("dim").get<std::string>());
-  hidden_dim = std::stoi(yalm.metadata.at("hidden_dim").get<std::string>());
-  head_dim = std::stoi(yalm.metadata.at("head_dim").get<std::string>());
-  n_layers = std::stoi(yalm.metadata.at("n_layers").get<std::string>());
-  n_heads = std::stoi(yalm.metadata.at("n_heads").get<std::string>());
-  n_kv_heads = std::stoi(yalm.metadata.at("n_kv_heads").get<std::string>());
-  vocab_size = std::stoi(yalm.metadata.at("vocab_size").get<std::string>());
+  dim = std::stoi(aetx.metadata.at("dim").get<std::string>());
+  hidden_dim = std::stoi(aetx.metadata.at("hidden_dim").get<std::string>());
+  head_dim = std::stoi(aetx.metadata.at("head_dim").get<std::string>());
+  n_layers = std::stoi(aetx.metadata.at("n_layers").get<std::string>());
+  n_heads = std::stoi(aetx.metadata.at("n_heads").get<std::string>());
+  n_kv_heads = std::stoi(aetx.metadata.at("n_kv_heads").get<std::string>());
+  vocab_size = std::stoi(aetx.metadata.at("vocab_size").get<std::string>());
   // mixture of experts
-  n_experts = yalm.metadata.contains("n_experts") ? std::stoi(yalm.metadata.at("n_experts").get<std::string>()) : 0;
-  n_experts_active = yalm.metadata.contains("n_experts_active") ? std::stoi(yalm.metadata.at("n_experts_active").get<std::string>()) : 0;
+  n_experts = aetx.metadata.contains("n_experts") ? std::stoi(aetx.metadata.at("n_experts").get<std::string>()) : 0;
+  n_experts_active = aetx.metadata.contains("n_experts_active") ? std::stoi(aetx.metadata.at("n_experts_active").get<std::string>()) : 0;
 
   // for now limit seq_len to 4096 to avoid KV cache OOM for models like Mistral since window size isn't correctly specified
-  max_seq_len = std::min(std::stoi(yalm.metadata.at("max_seq_len").get<std::string>()), 4096);
+  max_seq_len = std::min(std::stoi(aetx.metadata.at("max_seq_len").get<std::string>()), 4096);
   if (context) {
     max_seq_len = context;
   }
 
-  rope_theta = std::stof(yalm.metadata.at("rope_theta").get<std::string>());
-  rotary_dim = std::stoi(yalm.metadata.at("rotary_dim").get<std::string>());
+  rope_theta = std::stof(aetx.metadata.at("rope_theta").get<std::string>());
+  rotary_dim = std::stoi(aetx.metadata.at("rotary_dim").get<std::string>());
 
-  norm_eps = std::stof(yalm.metadata.value("norm_eps", "1e-5"));
+  norm_eps = std::stof(aetx.metadata.value("norm_eps", "1e-5"));
 
-  std::string act_str = yalm.metadata.value("act_type", "gelu");
+  std::string act_str = aetx.metadata.value("act_type", "gelu");
   if (act_str == "gelu") {
     act = ActivationType::GELU;
   } else if (act_str == "silu") {
@@ -48,7 +48,7 @@ void Config::from_yalm(YALMData& yalm, int context) {
     act = ActivationType::GELU;
   }
 
-  std::string norm_type_str = yalm.metadata.value("norm_type", "rmsnorm");
+  std::string norm_type_str = aetx.metadata.value("norm_type", "rmsnorm");
   if (norm_type_str == "rmsnorm") {
     norm_type = LayerNormType::RMSNorm;
   } else {
@@ -56,9 +56,9 @@ void Config::from_yalm(YALMData& yalm, int context) {
     norm_type = LayerNormType::RMSNorm;
   }
 
-  qkv_clip = yalm.metadata.contains("qkv_clip") ? std::stof(yalm.metadata.at("qkv_clip").get<std::string>()) : FLT_MAX;
+  qkv_clip = aetx.metadata.contains("qkv_clip") ? std::stof(aetx.metadata.at("qkv_clip").get<std::string>()) : FLT_MAX;
 
-  std::string dtype = yalm.metadata.at("dtype").get<std::string>();
+  std::string dtype = aetx.metadata.at("dtype").get<std::string>();
   // TODO: support fp8
   if (dtype == "fp32") {
     weight_dtype = DType::F32;
@@ -116,9 +116,9 @@ void* check_tensor(const Tensor* tensor, DType weight_dtype, std::array<int, 4> 
   return tensor->data;
 };
 
-const Tensor* get_tensor(const YALMData& yalm, const std::string& key) {
-  auto it = yalm.tensors.find(key);
-  if (it == yalm.tensors.end()) {
+const Tensor* get_tensor(const AETXData& aetx, const std::string& key) {
+  auto it = aetx.tensors.find(key);
+  if (it == aetx.tensors.end()) {
     std::cerr << "FATAL: missing tensor: " << key << std::endl;
     assert(false);
     return nullptr;
@@ -397,13 +397,13 @@ void InferenceState::cuda() {
   }
 }
 
-Model::Model(YALMData& yalm, int context) {
+Model::Model(AETXData& aetx, int context) {
   config = std::make_shared<Config>();
-  config->from_yalm(yalm, context);
+  config->from_aetx(aetx, context);
   std::cout << "loading model with dtype: " << dtype_to_string(config->weight_dtype) << std::endl;
 
   token_embedding_table = check_tensor(
-    get_tensor(yalm, "model.embed.weight"), 
+    get_tensor(aetx, "model.embed.weight"), 
     config->weight_dtype,
     {config->vocab_size, config->dim, 0, 0}
   );
@@ -412,34 +412,34 @@ Model::Model(YALMData& yalm, int context) {
     blocks.emplace_back(std::make_shared<Block>(
       i,
       config,
-      get_tensor(yalm, fmt::format("model.layers.{}.attn.norm.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.mlp.norm.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.attn.wq.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.attn.wk.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.attn.wv.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.attn.wo.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.mlp.w1.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.mlp.w2.weight", i)),
-      get_tensor(yalm, fmt::format("model.layers.{}.mlp.w3.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.attn.norm.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.mlp.norm.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.attn.wq.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.attn.wk.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.attn.wv.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.attn.wo.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.mlp.w1.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.mlp.w2.weight", i)),
+      get_tensor(aetx, fmt::format("model.layers.{}.mlp.w3.weight", i)),
       
-      config->n_experts > 0 ? get_tensor(yalm, fmt::format("model.layers.{}.moegate.weight", i)) : nullptr,
-      config->arch == "Qwen2ForCausalLM" ? get_tensor(yalm, fmt::format("model.layers.{}.attn.wq.bias", i)) : nullptr,
-      config->arch == "Qwen2ForCausalLM" ?  get_tensor(yalm, fmt::format("model.layers.{}.attn.wk.bias", i)) : nullptr,
-      config->arch == "Qwen2ForCausalLM" ?  get_tensor(yalm, fmt::format("model.layers.{}.attn.wv.bias", i)) : nullptr
+      config->n_experts > 0 ? get_tensor(aetx, fmt::format("model.layers.{}.moegate.weight", i)) : nullptr,
+      config->arch == "Qwen2ForCausalLM" ? get_tensor(aetx, fmt::format("model.layers.{}.attn.wq.bias", i)) : nullptr,
+      config->arch == "Qwen2ForCausalLM" ?  get_tensor(aetx, fmt::format("model.layers.{}.attn.wk.bias", i)) : nullptr,
+      config->arch == "Qwen2ForCausalLM" ?  get_tensor(aetx, fmt::format("model.layers.{}.attn.wv.bias", i)) : nullptr
     ));
   }
 
   rms_final_weight = static_cast<float*>(check_tensor(
-    get_tensor(yalm, "model.norm.weight"), 
+    get_tensor(aetx, "model.norm.weight"), 
     DType::F32, 
     {config->dim, 0, 0, 0}
   ));
-  bool tie_word_embeddings = yalm.tensors.count("model.output.weight") == 0;
+  bool tie_word_embeddings = aetx.tensors.count("model.output.weight") == 0;
   if (tie_word_embeddings) {
     wcls = token_embedding_table;
   } else {
     wcls = check_tensor(
-      get_tensor(yalm, "model.output.weight"), 
+      get_tensor(aetx, "model.output.weight"), 
       config->weight_dtype, 
       {config->vocab_size, config->dim, 0, 0}
     );

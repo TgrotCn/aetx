@@ -16,7 +16,7 @@ struct TokenTrie {
 };
 
 /*
-A tokenizer vocab consists of a concatenated tensor with the key "tokenizer.tokens" in the .yalm file.
+A tokenizer vocab consists of a concatenated tensor with the key "tokenizer.tokens" in the .aetx file.
 Shown as a list of strings:
 ```
 "tokenizer.tokens": [
@@ -41,7 +41,7 @@ In tensor form, it looks like a UTF-8 encoded byte array:
 ```
 <unk>\0<s>\0</s>\0<0x00>\0<0x01>\0<0x02>\0...\0<0xFE>\0<0xFF>\0▁▁\0▁▁▁▁\0▁t\0in\0er\0...
 ```
-Important token IDs are included in the metadata of the .yalm file:
+Important token IDs are included in the metadata of the .aetx file:
 ```
 "bos_token_id": "1",
 "eos_token_id": "2",
@@ -64,7 +64,7 @@ struct Tokenizer {
   // TODO: use constexpr?
   std::string byte_pieces[256];
 
-  Tokenizer(const YALMData& data);
+  Tokenizer(const AETXData& data);
 
   std::vector<int> encode(const std::string& text, bool encode_bos) const;
   std::string decode_one(int prev_token, int token) const;

@@ -1,6 +1,6 @@
 #include "tokenizer.h"
 
-Tokenizer::Tokenizer(const YALMData& data) {
+Tokenizer::Tokenizer(const AETXData& data) {
   this->bos_id = std::stoi(data.metadata.at("bos_token_id").get<std::string>());
   this->eos_id = std::stoi(data.metadata.at("eos_token_id").get<std::string>());
   // TODO: figure out edge cases:

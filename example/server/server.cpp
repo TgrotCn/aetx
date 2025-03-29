@@ -116,7 +116,7 @@ private:
     void load_model() {
         try {
             std::cout << "Loading model from " << checkpoint_path << std::endl;
-            model_data = std::make_unique<YALMData>();
+            model_data = std::make_unique<AETXData>();
             model_data->from_file(checkpoint_path);
             
             // 模型加载成功
@@ -209,7 +209,7 @@ private:
     }
 
     std::string checkpoint_path;
-    std::unique_ptr<YALMData> model_data;
+    std::unique_ptr<AETXData> model_data;
     std::atomic<bool> model_ready;
     InferenceQueue inference_queue;
     std::thread worker_thread;
@@ -314,7 +314,7 @@ int main(int argc, char* argv[]) {
     });
     
     // 启动服务器
-    std::cout << fmt::format("YALM API server running on port {}", port) << std::endl;
+    std::cout << fmt::format("AETX API server running on port {}", port) << std::endl;
     app.port(port).multithreaded().run();
     
     return 0;

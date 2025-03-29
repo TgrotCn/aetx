@@ -1,6 +1,6 @@
-# atex
+# aetx
 
-**atex** is an advanced inference framework designed to evolve from a simple engine into a mainstream, production-grade inference solution. Currently, the framework supports the Qwen2-1.5B model and is actively being enhanced with features such as quantization, multi-card (multi-GPU) inference, and a host of performance optimizations.
+**aetx** is an advanced inference framework designed to evolve from a simple engine into a mainstream, production-grade inference solution. Currently, the framework supports the Qwen2-1.5B model and is actively being enhanced with features such as quantization, multi-card (multi-GPU) inference, and a host of performance optimizations.
 
 ---
 
@@ -34,7 +34,7 @@ Latest benchmarks with Mistral-7B-Instruct-v0.2 in FP16 with 4k context, on RTX 
 | huggingface transformers, GPU | 25.9 | 25.7 |
 | llama.cpp, GPU | 61.0 | 58.8 |
 | calm, GPU | 66.0 | 65.7 |
-| yalm, GPU | 63.8 | 58.7 |
+| aetx, GPU | 63.8 | 58.7 |
 
 ## Getting Started
 
@@ -51,8 +51,8 @@ Before you begin, make sure you have the following installed:
 Clone the repository and build the project:
 
 ```bash
-git clone https://github.com/tgrotcn/atex.git
-cd atex
+git clone https://github.com/tgrotcn/aetx.git
+cd aetx
 mkdir build && cd build
 cmake ..
 make -j$(nproc)
