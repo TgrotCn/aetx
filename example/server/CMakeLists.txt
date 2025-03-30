@@ -1,0 +1,6 @@
+set(TARGET aetx-server)
+add_executable(${TARGET} server.cpp)
+install(TARGETS ${TARGET} RUNTIME)
+target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/thirdparty/crow/include)
+target_link_libraries(${TARGET} PRIVATE Threads::Threads aetx Crow ${CMAKE_THREAD_LIBS_INIT})
+target_compile_features(${TARGET} PRIVATE cxx_std_17)

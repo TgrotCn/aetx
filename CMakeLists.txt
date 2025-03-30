@@ -63,7 +63,7 @@ option(AETX_BUILD_COMMON "aetx: build common utils library" ${AETX_STANDALONE})
 # extra artifacts
 option(AETX_BUILD_TESTS    "aetx: build tests"          ${AETX_STANDALONE})
 option(AETX_BUILD_EXAMPLES "aetx: build examples"       ${AETX_STANDALONE})
-option(AETX_BUILD_SERVER   "aetx: build server example" OFF)
+option(AETX_BUILD_SERVER   "aetx: build server example" ${AETX_STANDALONE})
 
 # 3rd party libs
 # option(LLAMA_CURL "llama: use libcurl to download model from an URL" OFF)
@@ -99,6 +99,8 @@ endfunction()
 add_subdirectory(src)
 # vendor
 add_subdirectory(vendor)
+add_subdirectory(thirdparty/crow)
+
     # examples
 if (AETX_BUILD_EXAMPLES)
     add_subdirectory(example)
